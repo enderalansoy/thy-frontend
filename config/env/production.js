@@ -251,10 +251,10 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     onlyAllowOrigins: [
-      'https://aqueous-wildwood-29737.herokuapp.com/',
-      'http://aqueous-wildwood-29737.herokuapp.com/',
-      'https://thymesis-frontend.herokuapp.com/',
-      'https://thymesis-frontend.herokuapp.com/'
+      'https://aqueous-wildwood-29737.herokuapp.com',
+      'http://aqueous-wildwood-29737.herokuapp.com',
+      'https://thymesis-frontend.herokuapp.com',
+      'https://thymesis-frontend.herokuapp.com'
       
     ],
 

@@ -1,14 +1,23 @@
 <div class="card border-primary mb-3">
 <div class="card-header"><h4><%= memory.title %></h4></div>
 <div class="card-body">
+  <% if (memory.image_url !== null) { %>
+    <% if (memory.image_url !== 'none') { %>
+        <img src="<%= memory.image_url %>">
+        <% if (typeof user !== 'undefined') { %>
+        <a href="/annotateimg/<%=memory.post_id%>"><button class="btn btn-warning my-2 my-sm-0 float-right">Annotate image</button></a>
+        <% } %>
+    <% } %>
+  <% } %>
   <p class="card-text"><i><%= memory.summary %></i></p>
-  <p class="card-text"><%= memory.body %></p>
+  <p class="card-text"><%= memory.body %>
+  <% if (typeof user !== 'undefined') { %>
+  <a href="/annotate/<%=memory.post_id%>"><button class="btn btn-warning my-2 my-sm-0 float-right">Annotate text</button></a>
+  <% } %>
+  </p>
 </div>
   <div class="card-footer text-muted">
   created <%= memory.datetime %> by <%= memory.user %> from <%= memory.location %>
-  <% if (typeof user !== 'undefined') { %>
-  <a href="/annotate/<%=memory.post_id%>"><button class="btn btn-warning my-2 my-sm-0 float-right">Annotate</button></a>
-  <% } %>
 </div>
 </div>
 
@@ -44,3 +53,4 @@
 <% } %>
   
 </div>
+

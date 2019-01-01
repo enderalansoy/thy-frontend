@@ -1,0 +1,32 @@
+<div class="card border-primary mb-3">
+<div class="card-header"><h4><%= memory.title %></h4></div>
+<div class="card-body">
+  <% if (memory.image_url !== null) { %>
+    <% if (memory.image_url !== 'none') { %>
+        <img class="annotatable card-img-top" src="<%= memory.image_url %>">
+    <% } %>
+  <% } %>
+  </p>
+  <button type="button" class="btn btn-primary" onclick="getAnn()">Show annotations</button>
+</div>
+</div>
+
+
+<script>
+
+setTimeout(function () {
+    anno.addAnnotation({
+        src: '<%=memory.image_url%>',
+        context: window.location.href,
+        text: 'My annotation',
+        shapes: [{
+            type : 'rect',
+            units: 'pixel',
+
+            /** The shape geometry (pixel coordinates) **/
+            geometry : { x : 100, y: 100, width : 40, height: 60 }
+            }],
+    })
+}, 1000);
+
+</script>

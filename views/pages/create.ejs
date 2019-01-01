@@ -19,8 +19,14 @@
     <textarea class="form-control" name="body" placeholder="body" rows="5"></textarea>
 </div>
 
+<input type="file" id="file" onchange="upload()"/>
+
+<div id="output"></div>
+
+
 <div id="map"></div>
 
+<input type="hidden" id="image_url" name="image_url" value="none">
 <input type="hidden" id="lat" name="lat" value="0">
 <input type="hidden" id="lng" name="lng" value="0">
 
@@ -101,3 +107,25 @@ function markerLocation(){
 google.maps.event.addDomListener(window, 'load', initMap);
 
 </script>
+
+<script>
+
+function upload() {
+    const config = {
+            headers: { 'content-type': 'multipart/form-data' },
+            onUploadProgress: (progressEvent) => {
+                    if (progressEvent.lengthComputable) {
+                        document.getElementById('output').innerHTML = 'Please wait...';
+                    }
+           }
+        }
+    let data = new FormData();
+    data.append('image', document.getElementById('file').files[0], 'image');
+    axios.post('/post/upload', data, config).then((response) => {
+        console.log("file uploaded")
+        document.getElementById('output').innerHTML = 'file uploaded';
+        document.getElementById('image_url').value = response.data.file;
+    })
+}
+
+  </script>

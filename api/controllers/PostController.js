@@ -6,13 +6,24 @@
  */
 
 const axios = require('axios');
-const url = 'https://thymesis-memories-v2.herokuapp.com/api/Posts/'
-const commentUrl = 'https://thymesis-memories-v2.herokuapp.com/api/Comments/'
-const annotationUrl = 'http://thymesis-api.herokuapp.com/add/annotation/'
 
-// http://thymesis-api.herokuapp.com/add/annotation/?id=http://thymesis.com/annotation/1&creator_id=1
-//             &target={"type": "Text", "source": "http://example.org/memory1", "selector": {"type": "TextPositionSelector",
-//             "start": "412", "end": "795"}}
+const options =
+    { // This is the usual stuff
+    adapter: require('skipper-better-s3')
+    , key: 'AKIAJDWIA2AIFP6AC2FA'
+    , secret: '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'
+    , bucket: 'thymesis-aws'
+    , region: 'us-east-1'
+    , s3params:
+    { ACL: 'public-read'
+    }
+    , onProgress: progress => sails.log.verbose('Upload progress:', progress)
+    }
+
+
+const url = 'https://thymesis-memories-v3.herokuapp.com/api/Posts/'
+const commentUrl = 'https://thymesis-memories-v3.herokuapp.com/api/Comments/'
+const annotationUrl = 'http://thymesis-api.herokuapp.com/add/annotation/'
 
 module.exports = {
 
@@ -24,7 +35,17 @@ module.exports = {
         });
     },
 
+    upload: (req, res) => {
+        req.file('image').upload(options, (err, filesUploaded) => {
+          if (err) return res.serverError(err);
+          return res.json({ file: filesUploaded[0].extra.Location});
+        });
+      },
+
     new: (req, res) => {
+        console.log(req.query);
+        console.log(req.cookies.user.home_page)
+        console.log(req.cookies.user.user_id)
         if (typeof req.cookies.user !== 'undefined') {
             axios.post(url, {
                 uri: req.cookies.user.home_page,
@@ -32,14 +53,14 @@ module.exports = {
                 summary: req.query.summary,
                 body: req.query.body,
                 location: req.query.lat + ':' + req.query.lng,
-                type: 'text',
+                image_url: req.query.image_url,
                 votes: 0,
                 user: req.cookies.user.user_id,
             }).then((response) => {
-                
+                console.log(response.data);
                 return res.send(response.data);
             }).catch((error) => {
-                return res.send(error);
+                console.log(error)
             });
         } else {
             return res.json('please login for this');
@@ -85,13 +106,21 @@ module.exports = {
         });
     },
 
+    annotateimg: (req, res) => {
+        if (typeof req.param('id') === 'undefined') {
+            return res.redirect('/')
+        }
+        axios.get(url + req.param('id')).then((response) => {
+            let memory = response.data;
+            return res.view('pages/annotateimg', { memory, user: req.cookies.user });
+        }).catch((error) => {
+            return res.send(error);
+        });
+    },
+
     newanno: (req, res) => {
-        axios.put(annotationUrl,{
-            target: req.query.target,
-            id: req.query.id,
-            creator_id: 1,
-        }).then((response) =>{
-            return res.json(response.data);
+        axios.put(`${annotationUrl}?id=${req.query.id}&target=${req.query.target}&creator_1=1`).then((response) => {
+            return res.redirect(req.query.id);
         }).catch((error) => {
             let x = error.data;
             return res.send(x);

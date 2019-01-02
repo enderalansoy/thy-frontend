@@ -1,9 +1,16 @@
+<style>
+.fit {
+  max-width: 100%;
+  max-height: 100%;
+}
+</style>
+
 <div class="card border-primary mb-3">
 <div class="card-header"><h4><%= memory.title %></h4></div>
 <div class="card-body">
   <% if (memory.image_url !== null) { %>
     <% if (memory.image_url !== 'none') { %>
-        <img class="annotatable" src="<%= memory.image_url %>">
+        <img class="annotatable fit" src="<%= memory.image_url %>">
         <% if (typeof user !== 'undefined') { %>
         <a href="/annotateimg/<%=memory.post_id%>"><button class="btn btn-warning my-2 my-sm-0 float-right">Annotate image</button></a>
         <% } %>
@@ -17,7 +24,7 @@
   </p>
 </div>
   <div class="card-footer text-muted">
-  created <%= memory.datetime %> by <%= memory.user %> from <%= memory.location %>
+  created <%= memory.datetime %> by <span id="<%=memory.post_id%>" class="badge badge-primary badge-pill"></span> from <a href="https://www.google.com/maps/place/<%= memory.location.replace(':',',')%>">this location.</a>
 </div>
 </div>
 
@@ -29,9 +36,10 @@
 
     <ul class="list-group">
     <% comments.forEach((comment) => { %>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+        <li class="list-group-item align-items-center">
         <p><%= comment.body %></p>
-        <span class="badge badge-primary badge-pill">by <%=comment.user%></span>
+        <span id="<%=comment.comment_id%>" class="badge badge-secondary badge-pill"></span>
+        <span class="badge badge-pill badge-info"><%= comment.datetime %></span>
     </li>
     <% }) %>
     </ul>
@@ -78,5 +86,20 @@ axios.get('/post/getAnnotations?post_id=<%=memory.post_id%>').then((response) =>
 })    
  
 });
+
+</script>
+
+<script>
+
+  axios.get('http://thymesis-memories-v3.herokuapp.com/api/Users/<%=memory.user%>').then((response) => {
+    document.getElementById('<%=memory.post_id%>').innerText = response.data.username;
+  })
+
+  <% comments.forEach((comment) => { %>
+  axios.get('http://thymesis-memories-v3.herokuapp.com/api/Users/<%=comment.user%>').then((response) => {
+    document.getElementById('<%=comment.comment_id%>').innerText = 'by ' + response.data.username;
+  })
+  <% }) %>
+
 
 </script>

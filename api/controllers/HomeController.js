@@ -6,6 +6,7 @@
  */
 
 const axios = require('axios');
+const moment = require('moment')
 const url = 'https://thymesis-memories-v3.herokuapp.com/api/Posts/'
 const userUrl = 'https://thymesis-memories-v3.herokuapp.com/api/Users/'
 
@@ -21,6 +22,9 @@ module.exports = {
                 if(keyA > keyB) return -1;
                 if(keyA < keyB) return 1;
                 return 0;
+            });
+            posts.forEach((post) => {
+                post.datetime = moment(post.datetime).startOf('hour').fromNow();
             });
             return res.view('pages/homepage', { 
                 user: req.cookies.user,

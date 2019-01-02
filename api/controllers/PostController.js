@@ -6,6 +6,8 @@
  */
 
 const axios = require('axios');
+const moment = require('moment');
+
 
 const options =
     { // This is the usual stuff
@@ -75,6 +77,7 @@ module.exports = {
         }
         axios.get(url + req.param('id')).then((response) => {
             let memory = response.data;
+            memory.datetime = moment(memory.datetime).startOf('hour').fromNow();
             axios.get(commentUrl).then((resp) => {
                 let comments = [];
                 let allComments = resp.data;

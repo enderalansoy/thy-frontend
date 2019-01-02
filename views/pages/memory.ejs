@@ -91,12 +91,12 @@ axios.get('/post/getAnnotations?post_id=<%=memory.post_id%>').then((response) =>
 
 <script>
 
-  axios.get('http://thymesis-memories-v3.herokuapp.com/api/Users/<%=memory.user%>').then((response) => {
+  axios.get('https://thymesis-memories-v3.herokuapp.com/api/Users/<%=memory.user%>').then((response) => {
     document.getElementById('<%=memory.post_id%>').innerText = response.data.username;
   })
 
   <% comments.forEach((comment) => { %>
-  axios.get('http://thymesis-memories-v3.herokuapp.com/api/Users/<%=comment.user%>').then((response) => {
+  axios.get('https://thymesis-memories-v3.herokuapp.com/api/Users/<%=comment.user%>').then((response) => {
     document.getElementById('<%=comment.comment_id%>').innerText = 'by ' + response.data.username;
   })
   <% }) %>

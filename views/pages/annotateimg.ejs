@@ -7,26 +7,54 @@
     <% } %>
   <% } %>
   </p>
-  <button type="button" class="btn btn-primary" onclick="getAnn()">Show annotations</button>
+  <a href="/memory/<%=memory.post_id%>"><button type="button" class="btn btn-primary">Go back to memory</button></a>
 </div>
 </div>
+
+<script src="/optionaljs/axios.js"></script>
 
 
 <script>
 
-setTimeout(function () {
-    anno.addAnnotation({
-        src: '<%=memory.image_url%>',
-        context: window.location.href,
-        text: 'My annotation',
-        shapes: [{
-            type : 'rect',
-            units: 'pixel',
-
-            /** The shape geometry (pixel coordinates) **/
-            geometry : { x : 100, y: 100, width : 40, height: 60 }
+axios.get('/post/getAnnotations?post_id=<%=memory.post_id%>').then((response) => {
+    console.log(response.data.imageAnnotations);
+    setTimeout(function () {
+        response.data.imageAnnotations.forEach((a) => {
+        anno.addAnnotation({
+            src: '<%=memory.image_url%>',
+            context: window.location.href,
+            text: a.body,
+            shapes: [{
+                type : 'rect',
+                geometry : { x: a.x, y: a.y, width: a.w, height: a.h }
             }],
+        })
+    }, 1000);   
+})
+}); 
+
+anno.addHandler('onAnnotationCreated', (annotation) => {
+    let data = {
+        id: '<%=memory.post_id%>',
+        body: annotation.text,
+        x: annotation.shapes[0].geometry.x,
+        y: annotation.shapes[0].geometry.y,
+        w: annotation.shapes[0].geometry.width,
+        h: annotation.shapes[0].geometry.height,
+    }
+    console.log(data);
+    axios.post('/post/newimganno?id=<%=memory.post_id%>&body=' + annotation.text 
+    + '&x=' + annotation.shapes[0].geometry.x 
+    + '&y=' + annotation.shapes[0].geometry.y
+    + '&w=' + annotation.shapes[0].geometry.width
+    + '&h=' + annotation.shapes[0].geometry.height
+    ).then((response) => {
+        console.log(response)
+    }).catch((error) => {
+        console.log(error)
     })
-}, 1000);
+});
 
 </script>
+
+

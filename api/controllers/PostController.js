@@ -10,8 +10,8 @@ const axios = require('axios');
 const options =
     { // This is the usual stuff
     adapter: require('skipper-better-s3')
-    , key: 'AKIAJDWIA2AIFP6AC2FA'
-    , secret: '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'
+    , key: process.env.S3_KEY
+    , secret: process.env.S3_SECRET
     , bucket: 'thymesis-aws'
     , region: 'us-east-1'
     , s3params:
@@ -61,6 +61,7 @@ module.exports = {
                 return res.send(response.data);
             }).catch((error) => {
                 console.log(error)
+                return res.send(error);
             });
         } else {
             return res.json('please login for this');
@@ -118,6 +119,21 @@ module.exports = {
         });
     },
 
+    newimganno: (req, res) => {
+        let data = {
+            creator_id: 1,
+            body: 'http://thymesis.com/' + req.query.body,
+            target: `{type:'Image',format:'image/jpg',id:http://thymesis.com/image%23xywh=${req.query.x},${req.query.y},${req.query.w},${req.query.h}}`
+        }
+        let ur = 'http://thymesis-api.herokuapp.com/add/annotation/?creator_id=1&body=http://example.com/' + req.query.body + '&target={"type":"Image","format":"image/jpg","id":"' + req.query.id + '%23xywh=' + req.query.x + ',' + req.query.y + ',' + req.query.w + ',' + req.query.h + '"}'
+        console.log(ur)
+        axios.put(ur).then((response) => {
+            return res.json(response);
+        }).catch((error) => {
+            return res.json(error);
+        });
+    },
+
     newanno: (req, res) => {
         axios.put(`${annotationUrl}?id=${req.query.id}&target=${req.query.target}&creator_1=1`).then((response) => {
             return res.redirect(req.query.id);
@@ -137,6 +153,42 @@ module.exports = {
                 }
             });
             return res.json(userPosts);
+        });
+    },
+
+    getAnnotations: (req, res) => {
+        axios.get('https://thymesis-api.herokuapp.com/get/annotation/target/' + req.query.post_id).then((response) => {
+            let annotations = Object.values(response.data.message);
+            let imageAnnotations = [];
+            let textAnnotations = [];
+            annotations.forEach((annotation) => {
+                if (typeof annotation.target.id !== 'undefined') {
+                    if (annotation.target.type === 'Image') {
+                        let bodyUrl = annotation.body.split('/'); 
+                        let coordinates = annotation.target.id.split('xywh=')[1];
+                        let xywh = coordinates.split(',');
+                        imageAnnotations.push({
+                            body: bodyUrl[bodyUrl.length - 1],
+                            x: xywh[0],
+                            y: xywh[1],
+                            w: xywh[2],
+                            h: xywh[3],
+                        });
+                    } 
+                }
+
+                if (typeof annotation.body !== 'undefined') {
+                    if (annotation.target.type === 'Text') {
+                        let bodyUrl = annotation.body.split('/'); 
+                        textAnnotations.push({
+                            body: bodyUrl[bodyUrl.length - 1],
+                            start: annotation.target.selector.start,
+                            end: annotation.target.selector.end,
+                        });
+                    }
+                }
+            })
+            return res.json({imageAnnotations, textAnnotations});
         });
     },
 

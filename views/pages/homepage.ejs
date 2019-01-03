@@ -17,7 +17,7 @@ For more information, see:
       <p class="card-text"><%= memory.summary %></p>
     </div>
       <div class="card-footer text-muted">
-      created <%= memory.datetime %> by <span id="<%=memory.post_id%>" class="badge badge-primary badge-pill"></span> from <a href="https://www.google.com/maps/place/<%= memory.location.replace(':',',')%>">this location.</a>
+      created <%= memory.datetime %> by <a href="/user/<%=memory.user%>"><span id="<%=memory.post_id%>" class="badge badge-primary badge-pill"></span></a> from <a href="https://www.google.com/maps/place/<%= memory.location.replace(':',',')%>">this location.</a>
     </div>
   </div>
   <% }) %>

@@ -38,11 +38,7 @@ module.exports = {
     },
 
     signup: (req, res) => {
-        if (typeof req.cookies.user === 'undefined') {
-            return res.view('pages/signup', {user: req.cookies.user})
-        } else {
-            return res.redirect('/')
-        }
+        return res.view('pages/signup', {user: req.cookies.user})
     },
 
     new: (req, res) => {

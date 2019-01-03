@@ -35,7 +35,7 @@ img.thumbnail {
     </div>
     </div>
       <div class="card-footer text-muted">
-      created <%= memory.datetime %> by <a href="/user/<%=memory.user%>"><span id="<%=memory.post_id%>" class="badge badge-primary badge-pill"></span></a> from <a href="https://www.google.com/maps/place/<%= memory.location.replace(':',',')%>">this location.</a>
+      created <%= memory.datetime %> by <a href="/userpage/<%=memory.user%>"><span id="<%=memory.post_id%>" class="badge badge-primary badge-pill"></span></a> from <a href="https://www.google.com/maps/place/<%= memory.location.replace(':',',')%>">this location.</a>
     </div>
   </div>
   <% }) %>

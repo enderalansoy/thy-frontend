@@ -17,7 +17,7 @@
     <% } %>
   <% } %>
   <p class="card-text"><i><%= memory.summary %></i></p>
-  <p class="card-text"><%= memory.body %>
+  <p class="card-text" id="memory-text"><%= memory.body %>
   <% if (typeof user !== 'undefined') { %>
   <a href="/annotate/<%=memory.post_id%>"><button class="btn btn-warning my-2 my-sm-0 float-right">Annotate text</button></a>
   <% } %>
@@ -72,33 +72,40 @@
 
 <script>
 
+String.prototype.splice = function(idx, rem, str) {
+    return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+};
+
 anno.hideSelectionWidget()
 
 axios.get('/post/getAnnotations?post_id=<%=memory.post_id%>').then((response) => {
     console.log(response.data.textAnnotations);
     setTimeout(function () {
         response.data.imageAnnotations.forEach((a) => {
-        anno.addAnnotation({
-            src: '<%=memory.image_url%>',
-            context: window.location.href,
-            text: a.body,
-            shapes: [{
-                type : 'rect',
-                geometry : { x: a.x, y: a.y, width: a.w, height: a.h }
-            }],
-        })
-    }, 1000);   
-});
+            anno.addAnnotation({
+                src: '<%=memory.image_url%>',
+                context: window.location.href,
+                text: a.body,
+                shapes: [{
+                    type : 'rect',
+                    geometry : { x: a.x, y: a.y, width: a.w, height: a.h }
+                }],
+            })
+        }, 1000);   
+    });
+
+    response.data.textAnnotations.forEach((a) => {
+        let memo = document.getElementById('memory-text').innerHTML;
+        let start = a.start;
+        let end = a.end;
+        memo = memo.splice(start, 0, "<mark>");
+        memo = memo.splice(end + 6, 0, "</mark>");
+        document.getElementById('memory-text').innerHTML = memo;      
+    })
  
 });
 
-</script>
-
-<script>
-
-    String.prototype.splice = function(idx, rem, str) {
-        return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
-    };
+  
 
   axios.get('https://thymesis-memories-v3.herokuapp.com/api/Users/<%=memory.user%>').then((response) => {
     document.getElementById('<%=memory.post_id%>').innerText = response.data.username;
@@ -110,13 +117,5 @@ axios.get('/post/getAnnotations?post_id=<%=memory.post_id%>').then((response) =>
   })
   <% }) %>
 
-  let memo = document.getElementById('memory-text').innerHTML;
-  console.log(memo)
-  let start = 4;
-  let end = 12;
-  memo = memo.splice(start, 0, "<mark>");
-  memo = memo.splice(end + 6, 0, "</mark>");
-
-  document.getElementById('memory-text').innerHTML = memo;
 
 </script>

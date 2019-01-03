@@ -60,7 +60,7 @@ module.exports = {
                 user: req.cookies.user.user_id,
             }).then((response) => {
                 console.log(response.data);
-                return res.send(response.data);
+                return res.redirect('/memory/' + response.data.post_id);
             }).catch((error) => {
                 console.log(error)
                 return res.send(error);
@@ -123,12 +123,13 @@ module.exports = {
     },
 
     newimganno: (req, res) => {
+        let body = req.query.body.replace(' ','%20')
         let data = {
             creator_id: 1,
             body: 'http://thymesis.com/' + req.query.body,
             target: `{type:'Image',format:'image/jpg',id:http://thymesis.com/image%23xywh=${req.query.x},${req.query.y},${req.query.w},${req.query.h}}`
         }
-        let ur = 'http://thymesis-api.herokuapp.com/add/annotation/?creator_id=1&body=http://example.com/' + req.query.body + '&target={"type":"Image","format":"image/jpg","id":"' + req.query.id + '%23xywh=' + req.query.x + ',' + req.query.y + ',' + req.query.w + ',' + req.query.h + '"}'
+        let ur = 'http://thymesis-api.herokuapp.com/add/annotation/?creator_id=1&body=http://thymesis.com/' + body + '&target={"type":"Image","format":"image/jpg","id":"' + req.query.id + '%23xywh=' + req.query.x + ',' + req.query.y + ',' + req.query.w + ',' + req.query.h + '"}'
         console.log(ur)
         axios.put(ur).then((response) => {
             return res.json(response);
@@ -171,7 +172,7 @@ module.exports = {
                         let coordinates = annotation.target.id.split('xywh=')[1];
                         let xywh = coordinates.split(',');
                         imageAnnotations.push({
-                            body: bodyUrl[bodyUrl.length - 1],
+                            body: bodyUrl[bodyUrl.length - 1].replace(/_/g, " "),
                             x: xywh[0],
                             y: xywh[1],
                             w: xywh[2],

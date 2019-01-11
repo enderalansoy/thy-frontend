@@ -80,7 +80,7 @@ function buttonClicked() {
   let start = document.getElementById("corpus").innerText.indexOf(selection);
   let body = document.getElementById("body").innerText;
   let end = selection.length + start;
-  let target = '{"type":"Text","source":"http://thymesis.com/memory/<%=memory.post_id%>","selector":{"type":"TextPositionSelector","start":" '+ start +'","end":"'+end+'"}}'
+  let target = '{"type":"Text","source":"https://aqueous-wildwood-29737.herokuapp.com/memory/<%=memory.post_id%>","selector":{"type":"TextPositionSelector","start":" '+ start +'","end":"'+end+'"}}'
   axios.get('/post/newanno?target=' + target).then((response) => {
     console.log(response.data);
     window.location.href = '/memory/<%=memory.post_id%>';
